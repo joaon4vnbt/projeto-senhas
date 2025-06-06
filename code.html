@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gerador de Senhas Cyberpunk</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto+Mono&display=swap');
+
+    :root {
+      --neon-green: #00ff85;
+      --neon-pink: #ff44cc;
+      --neon-blue: #4dc3ff;
+      --neon-yellow: #f9ff00;
+      --dark-bg: #0a0a14;
+      --dark-card-bg: #121223;
+      --glow-blue: #0077ff;
+      --glow-pink: #ff33aa;
+      --glow-green: #00ff9c;
+      --font-main: 'Roboto Mono', monospace;
+      --font-display: 'Orbitron', sans-serif;
+    }
+
+    /* Reset & base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #0a0a14 0%, #05050a 100%);
+      color: var(--neon-green);
+      font-family: var(--font-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      user-select: none;
+    }
+
+    /* Container */
+    .container {
+      background: var(--dark-card-bg);
+      border-radius: 1rem;
+      box-shadow:
+        0 0 20px var(--neon-pink),
+        inset 0 0 30px var(--neon-blue);
+      width: 100%;
+      max-width: 480px;
+      padding: 2.5rem 2rem 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.75rem;
+      border: 1.5px solid var(--neon-pink);
+    }
+
+    /* Title Section */
+    .title-section {
+      text-align: center;
+      color: var(--neon-pink);
+      text-shadow:
+        0 0 6px var(--glow-pink),
+        0 0 12px var(--glow-pink);
+    }
+
+    .title-section img {
+      height: 64px;
+      margin-bottom: 0.5em;
+      filter: drop-shadow(0 0 3px var(--neon-pink));
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 2.5rem;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.2em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      font-weight: 500;
+      font-size: 1.15rem;
+      color: var(--neon-green);
+      text-shadow: 0 0 6px var(--glow-green);
+    }
+
+    /* Password display */
+    .password-display {
+      width: 100%;
+      background: #010117;
+      border: 1.8px solid var(--neon-green);
+      border-radius: 0.75rem;
+      padding: 1rem 1.5rem;
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: 0.1em;
+      color: var(--neon-green);
+      text-align: center;
+      user-select: all;
+      cursor: pointer;
+      transition: box-shadow 0.3s ease;
+      box-shadow: inset 0 0 10px var(--neon-green);
+      position: relative;
+      overflow-wrap: break-word;
+      word-break: break-all;
+    }
+    .password-display:hover {
+      box-shadow:
+        inset 0 0 20px var(--neon-green),
+        0 0 15px var(--neon-green);
+    }
+    .password-display:active {
+      box-shadow: inset 0 0 30px var(--neon-green);
+    }
+
+    /* Generate button */
+    #generate-btn {
+      margin-top: 0.8em;
+      padding: 0.85em 3em;
+      border: none;
+      border-radius: 0.9rem;
+      background: linear-gradient(45deg, var(--neon-pink), var(--neon-green));
+      color: #04040b;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      box-shadow:
+        0 0 5px var(--neon-pink),
+        0 0 15px var(--neon-green);
+      transition: filter 0.25s ease, box-shadow 0.3s ease;
+      user-select: none;
+      text-transform: uppercase;
+    }
+    #generate-btn:hover {
+      filter: brightness(1.15);
+      box-shadow:
+        0 0 12px var(--neon-pink),
+        0 0 35px var(--neon-green);
+    }
+    #generate-btn:active {
+      filter: brightness(0.85);
+      box-shadow: none;
+    }
+
+    /* Parameters section */
+    .parameters {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    /* Character count control */
+    .char-count {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--neon-yellow);
+      font-weight: 600;
+      user-select: none;
+    }
+    .char-count label {
+      margin-bottom: 0.4rem;
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-shadow: 0 0 8px var(--neon-yellow);
+    }
+    .count-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .count-btn {
+      background: transparent;
+      border: 2px solid var(--neon-yellow);
+      color: var(--neon-yellow);
+      font-size: 1.6rem;
+      line-height: 1;
+      padding: 0 1.2rem;
+      border-radius: 0.65rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 38px;
+      text-shadow: 0 0 8px var(--neon-yellow);
+    }
+    .count-btn:hover {
+      background: var(--neon-yellow);
+      color: #0a0a14;
+      box-shadow: 0 0 12px var(--neon-yellow);
+    }
+    .count-display {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      min-width: 3ch;
+      text-align: center;
+      text-shadow: 0 0 8px var(--neon-yellow);
+      user-select: none;
+    }
+
+    /* Checkboxes */
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      user-select: none;
+    }
+    .checkbox-group label {
+      color: var(--neon-blue);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1.05rem;
+      text-shadow: 0 0 6px var(--glow-blue);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      accent-color: var(--neon-pink);
+      filter: drop-shadow(0 0 2px var(--neon-pink));
+      border-radius: 0.35rem;
+    }
+
+    /* Strength bar */
+    .strength-container {
+      margin-top: 1rem;
+      user-select: none;
+      color: var(--neon-green);
+    }
+    .strength-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      letter-spacing: 0.07em;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--neon-yellow);
+      margin-top: 0.5em;
+      text-shadow: 0 0 6px var(--neon-yellow);
+    }
+    .strength-bar-bg {
+      background: #010117;
+      border-radius: 1rem;
+      height: 16px;
+      width: 100%;
+      box-shadow: inset 0 0 15px #000a16;
+      overflow: hidden;
+      margin-top: 0.4rem;
+    }
+    .strength-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 1rem;
+      transition: width 0.35s ease;
+      box-shadow: 0 0 8px;
+    }
+    .strength-bar.fraca {
+      background: #e71b32;
+      box-shadow: 0 0 13px #e71b32;
+    }
+    .strength-bar.media {
+      background: #faf408;
+      box-shadow: 0 0 20px #faf408;
+    }
+    .strength-bar.forte {
+      background: #00ff85;
+      box-shadow: 0 0 18px #00ff85;
+    }
+
+    /* Entropy text */
+    .entropy-text {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: var(--neon-pink);
+      min-height: 1.4em;
+      text-align: center;
+      font-weight: 600;
+      text-shadow: 0 0 8px var(--neon-pink);
+      user-select: none;
+    }
+
+    /* Responsive */
+    @media (min-width: 520px) {
+      .parameters {
+        flex-direction: row;
+        gap: 2.5rem;
+      }
+      .char-count,
+      .checkbox-group,
+      .strength-container {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container" role="main" aria-label="Gerador de senha cyberpunk">
+    <section class="title-section">
+      <img src="https://cdn-icons-png.flaticon.com/512/565/565655.png" alt="Ícone de cadeado neon" />
+      <h1>Gerador de Senhas</h1>
+      <h2>Gere instantaneamente uma senha aleatória e segura</h2>
+    </section>
+
+    <section class="password-display" tabindex="0" aria-label="Senha gerada. Clique para copiar." id="campo-senha" role="textbox"></section>
+    <button id="generate-btn" aria-describedby="desc-gerar">Gerar Senha</button>
+    <span id="desc-gerar" class="visually-hidden">Gera uma nova senha com as opções selecionadas</span>
+
+    <section class="parameters">
+      <div class="char-count" aria-label="Controle do número de caracteres da senha">
+        <label for="char-num">Número de caracteres</label>
+        <div class="count-controls" role="group" aria-labelledby="char-num">
+          <button class="count-btn" id="decrement-btn" aria-label="Diminuir número de caracteres">−</button>
+          <div class="count-display" id="char-num" aria-live="polite" aria-atomic="true">12</div>
+          <button class="count-btn" id="increment-btn" aria-label="Aumentar número de caracteres">+</button>
+        </div>
+      </div>
+
+      <fieldset class="checkbox-group" aria-label="Características da senha">
+        <legend style="position: absolute; width:1px; height:1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); clip-path: inset(100%); border:0;">Características da senha</legend>
+        <label><input type="checkbox" class="checkbox" id="maiusculo" checked /> Letras maiúsculas</label>
+        <label><input type="checkbox" class="checkbox" id="minusculo" /> Letras minúsculas</label>
+        <label><input type="checkbox" class="checkbox" id="numero" /> Números</label>
+        <label><input type="checkbox" class="checkbox" id="simbolo" /> Símbolos</label>
+      </fieldset>
+
+      <div class="strength-container" aria-live="polite" aria-atomic="true" aria-label="Força da senha">
+        <div class="strength-bar-bg" aria-hidden="true">
+          <div id="strength-bar" class="strength-bar"></div>
+        </div>
+        <div class="strength-labels" aria-hidden="true">
+          <span>Fraca</span><span>Média</span><span>Forte</span>
+        </div>
+        <p class="entropy-text" id="entropy-text"></p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const senhaDisplay = document.getElementById('campo-senha');
+      const generateBtn = document.getElementById('generate-btn');
+
+      const decrementBtn = document.getElementById('decrement-btn');
+      const incrementBtn = document.getElementById('increment-btn');
+      const countDisplay = document.getElementById('char-num');
+
+      const checkboxMaiusculo = document.getElementById('maiusculo');
+      const checkboxMinusculo = document.getElementById('minusculo');
+      const checkboxNumero = document.getElementById('numero');
+      const checkboxSimbolo = document.getElementById('simbolo');
+
+      const strengthBar = document.getElementById('strength-bar');
+      const entropyText = document.getElementById('entropy-text');
+
+      // Characters sets
+      const letrasMaiusculas = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const letrasMinusculas = 'abcdefghijklmnopqrstuvwxyz';
+      const numeros = '0123456789';
+      const simbolos = '!@#$%*?&';
+
+      // Password length limits
+      const minLength = 4;
+      const maxLength = 30;
+
+      // Initialize
+      let tamanhoSenha = 12;
+
+      // Set initial state on load
+      countDisplay.textContent = tamanhoSenha;
+
+      // Function to generate password
+      function geraSenha() {
+        let alfabeto = '';
+        if (checkboxMaiusculo.checked) alfabeto += letrasMaiusculas;
+        if (checkboxMinusculo.checked) alfabeto += letrasMinusculas;
+        if (checkboxNumero.checked) alfabeto += numeros;
+        if (checkboxSimbolo.checked) alfabeto += simbolos;
+
+        if (!alfabeto) {
+          senhaDisplay.textContent = '';
+          updateStrengthBar(0);
+          entropyText.textContent = 'Selecione pelo menos uma característica.';
+          return;
+        }
+
+        let senha = '';
+        for (let i = 0; i < tamanhoSenha; i++) {
+          const randIndex = Math.floor(Math.random() * alfabeto.length);
+          senha += alfabeto[randIndex];
+        }
+        senhaDisplay.textContent = senha;
+        classificaSenha(alfabeto.length);
+      }
+
+      // Strength classification and entropy calculation
+      function classificaSenha(tamanhoAlfabeto) {
+        const entropia = tamanhoSenha * Math.log2(tamanhoAlfabeto);
+        updateStrengthBar(entropia);
+
+        const dias = Math.floor(2 ** entropia / (100e6 * 60 * 60 * 24));
+        entropyText.textContent = dias > 0
+          ? `Um computador pode levar até ${dias.toLocaleString()} dias para descobrir essa senha.`
+          : 'Senha muito fraca para estimativa.';
+      }
+
+      // Update strength bar color and width
+      function updateStrengthBar(entropia) {
+        strengthBar.classList.remove('fraca', 'media', 'forte');
+        let widthPercent = 0;
+        if (entropia > 57) {
+          strengthBar.classList.add('forte');
+          widthPercent = 100;
+        } else if (entropia > 35) {
+          strengthBar.classList.add('media');
+          widthPercent = 60;
+        } else if (entropia > 0) {
+          strengthBar.classList.add('fraca');
+          widthPercent = 30;
+        }
+        strengthBar.style.width = widthPercent + '%';
+      }
+
+      // Change password length via buttons
+      decrementBtn.addEventListener('click', () => {
+        if (tamanhoSenha > minLength) {
+          tamanhoSenha--;
+          countDisplay.textContent = tamanhoSenha;
+          geraSenha();
+        }
+      });
+      incrementBtn.addEventListener('click', () => {
+        if (tamanhoSenha < maxLength) {
+          tamanhoSenha++;
+          countDisplay.textContent = tamanhoSenha;
+          geraSenha();
+        }
+      });
+
+      // Regenerate password when checkboxes change
+      [checkboxMaiusculo, checkboxMinusculo, checkboxNumero, checkboxSimbolo].forEach(cb => {
+        cb.addEventListener('change', () => {
+          geraSenha();
+        });
+      });
+
+      // Generate button click generates password
+      generateBtn.addEventListener('click', () => {
+        geraSenha();
+      });
+
+      // Copy password to clipboard on click
+      senhaDisplay.addEventListener('click', () => {
+        if (senhaDisplay.textContent) {
+          navigator.clipboard.writeText(senhaDisplay.textContent).then(() => {
+            entropyText.textContent = 'Senha copiada para a área de transferência!';
+            setTimeout(() => {
+              geraSenha();
+            }, 1500);
+          });
+        }
+      });
+
+      // Generate initial password on load
+      geraSenha();
+    })();
+  </script>
+
+  <style>
+    /* Screen reader only helper */
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px; width: 1px; overflow: hidden;
+      clip: rect(1px, 1px, 1px, 1px);
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+      padding: 0;
+      margin: -1px;
+    }
+  </style>
+</body>
+
+</html>
+
